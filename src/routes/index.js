@@ -29,21 +29,25 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/LoginResponse'
  *       400:
- *         description: Email e senha são obrigatórios
+ *         description: Email ou senha ausentes
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Email e senha são obrigatórios."
+ *             examples:
+ *               campos_obrigatorios:
+ *                 value:
+ *                   error: 'Email e senha são obrigatórios.'
  *       401:
  *         description: Credenciais inválidas
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Credenciais inválidas."
+ *             examples:
+ *               credenciais_invalidas:
+ *                 value:
+ *                   error: 'Credenciais inválidas.'
  */
 router.post('/login', authCtrl.login);
 
@@ -99,13 +103,15 @@ router.get('/salas', authMiddleware, roomCtrl.listRooms);
  *             schema:
  *               $ref: '#/components/schemas/Room'
  *       400:
- *         description: Nome, capacidade e localização são obrigatórios
+ *         description: Nome, capacidade ou localização ausentes
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Nome, capacidade e localização são obrigatórios."
+ *             examples:
+ *               campos_obrigatorios:
+ *                 value:
+ *                   error: 'Nome, capacidade e localização são obrigatórios.'
  *       401:
  *         description: Token não fornecido ou inválido
  *         content:
@@ -144,13 +150,18 @@ router.post('/criarSala', authMiddleware, requireRole('admin'), roomCtrl.createR
  *       200:
  *         description: Sala deletada com sucesso
  *       400:
- *         description: Sala possui agendamentos vinculados e não pode ser deletada
+ *         description: ID da sala ausente ou sala com agendamentos vinculados
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Sala possui agendamentos vinculados e não pode ser deletada."
+ *             examples:
+ *               id_obrigatorio:
+ *                 value:
+ *                   error: 'ID da sala é obrigatório.'
+ *               sala_com_agendamentos:
+ *                 value:
+ *                   error: 'Sala possui agendamentos vinculados e não pode ser deletada.'
  *       401:
  *         description: Token não fornecido ou inválido
  *         content:
@@ -168,13 +179,15 @@ router.post('/criarSala', authMiddleware, requireRole('admin'), roomCtrl.createR
  *             example:
  *               error: "Sem permissão para esta ação."
  *       404:
- *         description: Sala não encontrada
+ *         description: Sala informada não encontrada
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Sala não encontrada."
+ *             examples:
+ *               sala_nao_encontrada:
+ *                 value:
+ *                   error: 'Sala não encontrada.'
  */
 router.delete('/apagarSala/:id', authMiddleware, requireRole('admin'), roomCtrl.deleteRoom);
 
@@ -265,13 +278,36 @@ router.get('/agenda/:id', authMiddleware, schedCtrl.getSchedulesByRoom);
  *             schema:
  *               $ref: '#/components/schemas/Schedule'
  *       400:
- *         description: Campos obrigatórios ausentes ou dados inválidos (verifique formato de datas, horário futuro, duração máx 8h, antecedência máx 90 dias)
+ *         description: Dados inválidos para criar a reserva
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "roomId, start, end e title são obrigatórios."
+ *             examples:
+ *               campos_obrigatorios:
+ *                 summary: Campos obrigatórios ausentes
+ *                 value:
+ *                   error: 'Informe roomId, start, end e title para reservar a sala.'
+ *               datas_invalidas:
+ *                 summary: Datas em formato inválido
+ *                 value:
+ *                   error: 'As datas informadas são inválidas. Use o formato ISO 8601, como 2026-05-10T14:00:00.'
+ *               inicio_passado:
+ *                 summary: Horário inicial anterior ao momento atual
+ *                 value:
+ *                   error: 'Não é possível agendar com horário inicial anterior ao momento atual.'
+ *               horario_invalido:
+ *                 summary: Horário final menor ou igual ao inicial
+ *                 value:
+ *                   error: 'A hora final da reserva deve ser maior que a hora inicial.'
+ *               duracao_maxima:
+ *                 summary: Duração maior que 8 horas
+ *                 value:
+ *                   error: 'A reserva não pode ultrapassar 8 horas de duração.'
+ *               antecedencia_maxima:
+ *                 summary: Reserva com antecedência superior a 90 dias
+ *                 value:
+ *                   error: 'A reserva pode ser criada com no máximo 90 dias de antecedência.'
  *       401:
  *         description: Token não fornecido ou inválido
  *         content:
@@ -281,21 +317,30 @@ router.get('/agenda/:id', authMiddleware, schedCtrl.getSchedulesByRoom);
  *             example:
  *               error: "Token não fornecido."
  *       404:
- *         description: Sala não encontrada
+ *         description: Sala informada não encontrada
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Sala não encontrada."
+ *             examples:
+ *               sala_nao_encontrada:
+ *                 value:
+ *                   error: 'Sala informada não encontrada.'
  *       409:
- *         description: Conflito de horário - sala ou usuário já reservado neste período
+ *         description: Conflito de horário ao criar a reserva
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Conflito de horário: sala já reservada neste período."
+ *             examples:
+ *               sala_reservada:
+ *                 summary: Sala já reservada no período
+ *                 value:
+ *                   error: 'Não é possível agendar em horário já reservado para esta sala.'
+ *               funcionario_com_conflito:
+ *                 summary: Funcionário com outra reserva no mesmo horário
+ *                 value:
+ *                   error: 'Não é possível agendar duas reservas no mesmo horário para o mesmo funcionário.'
  */
 router.post('/reservarSala', authMiddleware, schedCtrl.reservarSala);
 
@@ -328,13 +373,27 @@ router.post('/reservarSala', authMiddleware, schedCtrl.reservarSala);
  *             schema:
  *               $ref: '#/components/schemas/Schedule'
  *       400:
- *         description: ID obrigatório ou dados inválidos (verifique formato de datas, horário futuro, duração máx 8h, antecedência máx 90 dias)
+ *         description: Dados inválidos ou intervalo de data inválido
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "ID do agendamento é obrigatório."
+ *             examples:
+ *               datas_invalidas:
+ *                 value:
+ *                   error: 'As datas informadas são inválidas. Use o formato ISO 8601, como 2026-05-10T14:00:00.'
+ *               inicio_passado:
+ *                 value:
+ *                   error: 'Não é possível agendar com horário inicial anterior ao momento atual.'
+ *               horario_invalido:
+ *                 value:
+ *                   error: 'A hora final da reserva deve ser maior que a hora inicial.'
+ *               duracao_maxima:
+ *                 value:
+ *                   error: 'A reserva não pode ultrapassar 8 horas de duração.'
+ *               antecedencia_maxima:
+ *                 value:
+ *                   error: 'A reserva pode ser criada com no máximo 90 dias de antecedência.'
  *       401:
  *         description: Token não fornecido ou inválido
  *         content:
@@ -344,29 +403,41 @@ router.post('/reservarSala', authMiddleware, schedCtrl.reservarSala);
  *             example:
  *               error: "Token não fornecido."
  *       403:
- *         description: Você não tem permissão para editar este agendamento
+ *         description: Usuário sem permissão para editar este agendamento
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Você não tem permissão para editar este agendamento."
+ *             examples:
+ *               sem_permissao:
+ *                 value:
+ *                   error: 'Você não tem permissão para editar este agendamento.'
  *       404:
- *         description: Agendamento não encontrado ou sala não encontrada
+ *         description: Agendamento ou sala não encontrada
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Agendamento não encontrado."
+ *             examples:
+ *               agendamento_nao_encontrado:
+ *                 value:
+ *                   error: 'Agendamento não encontrado.'
+ *               sala_nao_encontrada:
+ *                 value:
+ *                   error: 'Sala não encontrada.'
  *       409:
- *         description: Conflito de horário - sala já reservada ou funcionário já possui reserva neste período
+ *         description: Conflito de horário ao atualizar a reserva
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Conflito de horário: sala já reservada neste período."
+ *             examples:
+ *               sala_reservada:
+ *                 value:
+ *                   error: 'Conflito de horário: sala já reservada neste período.'
+ *               funcionario_com_conflito:
+ *                 value:
+ *                   error: 'Conflito de horário: o funcionário já possui uma reserva neste período.'
  */
 router.put('/ajustarAgendamento/:id', authMiddleware, schedCtrl.ajustarAgendamento);
 
@@ -397,21 +468,25 @@ router.put('/ajustarAgendamento/:id', authMiddleware, schedCtrl.ajustarAgendamen
  *             example:
  *               error: "Token não fornecido."
  *       403:
- *         description: Você não tem permissão para deletar este agendamento
+ *         description: Usuário sem permissão para deletar este agendamento
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Você não tem permissão para deletar este agendamento."
+ *             examples:
+ *               sem_permissao:
+ *                 value:
+ *                   error: 'Você não tem permissão para deletar este agendamento.'
  *       404:
  *         description: Agendamento não encontrado
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: "Agendamento não encontrado."
+ *             examples:
+ *               agendamento_nao_encontrado:
+ *                 value:
+ *                   error: 'Agendamento não encontrado.'
  */
 router.delete('/deletarAgendamento/:id', authMiddleware, schedCtrl.deletarAgendamento);
 
