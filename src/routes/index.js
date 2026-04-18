@@ -29,9 +29,21 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/LoginResponse'
  *       400:
- *         $ref: '#/components/responses/BadRequest'
+ *         description: Email e senha são obrigatórios
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Email e senha são obrigatórios."
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Credenciais inválidas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Credenciais inválidas."
  */
 router.post('/login', authCtrl.login);
 
@@ -55,7 +67,13 @@ router.post('/login', authCtrl.login);
  *               items:
  *                 $ref: '#/components/schemas/Room'
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Token não fornecido."
  */
 router.get('/salas', authMiddleware, roomCtrl.listRooms);
 
@@ -81,11 +99,29 @@ router.get('/salas', authMiddleware, roomCtrl.listRooms);
  *             schema:
  *               $ref: '#/components/schemas/Room'
  *       400:
- *         $ref: '#/components/responses/BadRequest'
+ *         description: Nome, capacidade e localização são obrigatórios
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Nome, capacidade e localização são obrigatórios."
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Token não fornecido."
  *       403:
- *         $ref: '#/components/responses/Forbidden'
+ *         description: Sem permissão para criar salas (apenas admin)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Sem permissão para esta ação."
  */
 router.post('/criarSala', authMiddleware, requireRole('admin'), roomCtrl.createRoom);
 
@@ -108,13 +144,37 @@ router.post('/criarSala', authMiddleware, requireRole('admin'), roomCtrl.createR
  *       200:
  *         description: Sala deletada com sucesso
  *       400:
- *         $ref: '#/components/responses/BadRequest'
+ *         description: Sala possui agendamentos vinculados e não pode ser deletada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Sala possui agendamentos vinculados e não pode ser deletada."
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Token não fornecido."
  *       403:
- *         $ref: '#/components/responses/Forbidden'
+ *         description: Sem permissão para deletar salas (apenas admin)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Sem permissão para esta ação."
  *       404:
- *         $ref: '#/components/responses/NotFound'
+ *         description: Sala não encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Sala não encontrada."
  */
 router.delete('/apagarSala/:id', authMiddleware, requireRole('admin'), roomCtrl.deleteRoom);
 
@@ -138,7 +198,13 @@ router.delete('/apagarSala/:id', authMiddleware, requireRole('admin'), roomCtrl.
  *               items:
  *                 $ref: '#/components/schemas/Schedule'
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Token não fornecido."
  */
 router.get('/agenda', authMiddleware, schedCtrl.getSchedules);
 
@@ -167,7 +233,13 @@ router.get('/agenda', authMiddleware, schedCtrl.getSchedules);
  *               items:
  *                 $ref: '#/components/schemas/Schedule'
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Token não fornecido."
  */
 router.get('/agenda/:id', authMiddleware, schedCtrl.getSchedulesByRoom);
 
@@ -193,13 +265,37 @@ router.get('/agenda/:id', authMiddleware, schedCtrl.getSchedulesByRoom);
  *             schema:
  *               $ref: '#/components/schemas/Schedule'
  *       400:
- *         $ref: '#/components/responses/BadRequest'
+ *         description: Campos obrigatórios ausentes ou dados inválidos (verifique formato de datas, horário futuro, duração máx 8h, antecedência máx 90 dias)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "roomId, start, end e title são obrigatórios."
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Token não fornecido."
  *       404:
- *         $ref: '#/components/responses/NotFound'
+ *         description: Sala não encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Sala não encontrada."
  *       409:
- *         $ref: '#/components/responses/Conflict'
+ *         description: Conflito de horário - sala ou usuário já reservado neste período
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Conflito de horário: sala já reservada neste período."
  */
 router.post('/reservarSala', authMiddleware, schedCtrl.reservarSala);
 
@@ -232,15 +328,45 @@ router.post('/reservarSala', authMiddleware, schedCtrl.reservarSala);
  *             schema:
  *               $ref: '#/components/schemas/Schedule'
  *       400:
- *         $ref: '#/components/responses/BadRequest'
+ *         description: ID obrigatório ou dados inválidos (verifique formato de datas, horário futuro, duração máx 8h, antecedência máx 90 dias)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "ID do agendamento é obrigatório."
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Token não fornecido."
  *       403:
- *         $ref: '#/components/responses/Forbidden'
+ *         description: Você não tem permissão para editar este agendamento
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Você não tem permissão para editar este agendamento."
  *       404:
- *         $ref: '#/components/responses/NotFound'
+ *         description: Agendamento não encontrado ou sala não encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Agendamento não encontrado."
  *       409:
- *         $ref: '#/components/responses/Conflict'
+ *         description: Conflito de horário - sala já reservada ou funcionário já possui reserva neste período
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Conflito de horário: sala já reservada neste período."
  */
 router.put('/ajustarAgendamento/:id', authMiddleware, schedCtrl.ajustarAgendamento);
 
@@ -263,11 +389,29 @@ router.put('/ajustarAgendamento/:id', authMiddleware, schedCtrl.ajustarAgendamen
  *       200:
  *         description: Agendamento deletado
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Token não fornecido."
  *       403:
- *         $ref: '#/components/responses/Forbidden'
+ *         description: Você não tem permissão para deletar este agendamento
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Você não tem permissão para deletar este agendamento."
  *       404:
- *         $ref: '#/components/responses/NotFound'
+ *         description: Agendamento não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Agendamento não encontrado."
  */
 router.delete('/deletarAgendamento/:id', authMiddleware, schedCtrl.deletarAgendamento);
 
