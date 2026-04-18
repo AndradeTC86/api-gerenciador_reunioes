@@ -1,4 +1,4 @@
-const swaggerJsdoc = require('swagger-jsdoc');
+﻿const swaggerJsdoc = require('swagger-jsdoc');
 
 const options = {
   definition: {
@@ -95,13 +95,6 @@ const options = {
             error: { type: 'string', example: 'Mensagem de erro' },
           },
         },
-      },
-      responses: {
-        BadRequest:   { description: 'Dados inválidos',                content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-        Unauthorized: { description: 'Token ausente ou inválido',      content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-        Forbidden:    { description: 'Sem permissão para esta ação',   content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-        NotFound:     { description: 'Recurso não encontrado',         content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-        Conflict:     { description: 'Conflito de horário detectado',  content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
       },
     },
     tags: [
