@@ -1,6 +1,7 @@
 # API Gerenciador de Reuniões
 
-API REST para agendamento de salas de reunião corporativas, desenvolvida como parte da simulação de Sprint Ágil da **Mentoria em Testes de Software 2.0 — Turma 3 2026**.
+API REST para agendamento de salas de reunião corporativas, desenvolvida como parte da simulação de Sprint Ágil da **Mentoria em Testes de Software 2.0 — Turma 3 2026**. 
+ [Criado utilizando o apoio do GitHub Copilot]
 
 ---
 
